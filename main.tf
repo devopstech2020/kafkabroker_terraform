@@ -202,7 +202,7 @@ resource "kubernetes_deployment" "kafka-primary" {
 
 resource "kubernetes_service" "schema-reg" {
   metadata {
-    name = "schema-registry"
+    name = "schema-reg"
     namespace = kubernetes_namespace.broker.metadata[0].name
   }
   spec {
