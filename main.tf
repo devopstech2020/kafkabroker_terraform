@@ -71,7 +71,7 @@ resource "kubernetes_service" "zookeeper-primary" {
   }
 }
 
-resource "kubernetes_deployment" "zookeeper-primary" {
+resource "kubernetes_stateful_set" "zookeeper-primary" {
   metadata {
     name      = "zookeeper-primary"
     namespace = kubernetes_namespace.broker.metadata[0].name
@@ -108,6 +108,7 @@ resource "kubernetes_deployment" "zookeeper-primary" {
         }
       }
     } 
+    service_name = "zookeeper-primary"
     selector {
       match_labels = { app = "zookeeper-primary"}
     }
@@ -137,7 +138,7 @@ resource "kubernetes_service" "kafka-primary" {
   }
 }
 
-resource "kubernetes_deployment" "kafka-primary" {
+resource "kubernetes_stateful_set" "kafka-primary" {
   metadata {
     name      = "kafka-primary"
     namespace = kubernetes_namespace.broker.metadata[0].name
@@ -153,10 +154,11 @@ resource "kubernetes_deployment" "kafka-primary" {
         container {
           name = "kafka-primary"
           image = "bitnami/kafka:latest"
-          env {
-            name = "KAFKA_BROKER_ID"
-            value = "1"
-          }
+          command = ["sh", "-exc",  "export KAFKA_BROKER_ID=$$( hostname |  awk -F- '{print $3}') && \\\nexec /opt/bitnami/scripts/kafka/entrypoint.sh '/opt/bitnami/scripts/kafka/run.sh'\n"]
+          #  env {
+          #    name = "KAFKA_BROKER_ID"
+          #    value = -1
+          #  }
           env {
             name = "KAFKA_CFG_ZOOKEEPER_CONNECT"
             value = "zookeeper-primary:2181"
@@ -194,6 +196,7 @@ resource "kubernetes_deployment" "kafka-primary" {
         }
       }
     }
+    service_name = "kafka-primary"
     selector {
       match_labels = { app = "kafka-primary" }
     }

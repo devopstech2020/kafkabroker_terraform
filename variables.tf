@@ -11,11 +11,11 @@ variable "namespace" {
 
 variable "zookeeper_repicas" {
     type = number
-    default = 2
+    default = 3
 }
 
 variable "kafka_repicas" {
     type = number
-    default = 2
+    default = 3
 }
     
